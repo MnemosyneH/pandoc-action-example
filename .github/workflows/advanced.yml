@@ -6,12 +6,26 @@ jobs:
   convert_via_pandoc:
     runs-on: ubuntu-18.04
     steps:
+      - name: Markdown
       - uses: actions/checkout@v2
       - run: mkdir output
+      - run: mkdir output/markdown
+      - uses: docker://pandoc/latex:2.9
+        with: # needs a README in your repo root!
+          args: "-s README.md -t markdown --wrap=preserve --reference-links -o ./markdown/manuscript.md"
+      - uses: actions/upload-artifact@master
+        with:
+          name: manuscript
+          path: output/markdown
+    steps:
+      - name: PDF
+      - uses: actions/checkout@v2
+      - run: mkdir output
+      - run: mkdir output/pdf
       - uses: docker://pandoc/latex:2.9
         with: # needs a README in your repo root!
           args: "--standalone --output=output/README.pdf README.md"
       - uses: actions/upload-artifact@master
         with:
           name: output
-          path: output
+          path: output/pdf
